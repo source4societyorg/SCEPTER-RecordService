@@ -1,12 +1,14 @@
-const HelloService = require('./service')
+const RecordService = require('./service')
+const utilities = require('@source4society/scepter-utility-lib')
 
 const handlerUtilities = {
-  constructHelloService: (environment, credentialsPath, servicesPath) => (
-    new HelloService(environment, credentialsPath, servicesPath)
+  constructRecordService: (environment, credentialsPath, servicesPath, parametersPath) => (
+    new RecordService(environment, credentialsPath, servicesPath, parametersPath)
   ),
-  ENVIRONMENT: process.env.stage || 'dev',
-  SERVICE_PATH: process.env.SERVICES_PATH || './services',
-  CREDENTIALS_PATH: process.env.CREDENTIALS_PATH || './credentials'
+  ENVIRONMENT: utilities.valueOrDefault(process.env.stage, 'dev'),
+  SERVICES_PATH: utilities.valueOrDefault(process.env.SERVICES_PATH, './services'),
+  CREDENTIALS_PATH: utilities.valueOrDefault(process.env.CREDENTIALS_PATH, './credentials'),
+  PARAMETERS_PATH: utilities.valueOrDefault(process.env.PARAMETERS_PATH, './parameters')
 }
 
 module.exports = handlerUtilities

@@ -1,25 +1,16 @@
-test('hello handler handles error properly', (done) => {
-  const helloHandler = require('../handler.hello')
-  const mockService = {
-    hello: () => { throw new Error('test error') },
-    prepareErrorResponse: () => done()
-  }
+'use strict'
 
-  helloHandler((result) => ({ done: done() }), undefined, (result) => done(), () => mockService)
+test('genericHandler invokes serviceCall', (done) => {
+  const genericHandler = require('../handler.js').genericHandlerFunction
+  const mockServiceCall = () => done()
+  const mockServiceConstructor = () => ({})
+  genericHandler(undefined, undefined, undefined, mockServiceCall, mockServiceConstructor)
 })
 
-test('handler injects optional dependencies', (done) => {
-  const helloHandler = require('../handler.hello')
-  helloHandler(
-    undefined,
-    undefined,
-    () => done(),
-    () => ({ hello: done() }),
-    'test',
-    './test/services-test.json',
-    './test/credentials-test.json',
-    () => done(),
-    (callbackFunc, service) => () => 'newfunc',
-    (callbackFunc, service) => () => 'newfunc'
-  )
+test('genericHandler invokes error handler on error', (done) => {
+  const genericHandler = require('../handler.js').genericHandlerFunction
+  const mockServiceCall = () => { throw new Error('test error') }
+  const mockServiceConstructor = () => ({ prepareErrorResponse: (error) => expect(error).toEqual(new Error('test error')) })
+  const mockCallback = () => done()
+  genericHandler(undefined, undefined, mockCallback, mockServiceCall, mockServiceConstructor)
 })

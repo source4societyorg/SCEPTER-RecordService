@@ -1,20 +1,21 @@
 {
-  "name": "@source4society/SCEPTER-service-template",
+  "name": "@eclass/RecordService",
   "version": "1.0.1",
-  "description": "Base template used for creating services",
+  "description": "Service for handling the majority of the ECLASS records",
   "main": "handler.js",
-  "repository": "git@github.com:source4societyorg/SCEPTER-service-template",
-  "author": "Source4Society.Org",
-  "license": "AGPL-3.0",
+  "repository": "",
+  "author": "NRAC",
+  "license": "UNLICENSED",
   "private": false,
   "scripts": {
     "test": "eslint ./**/*.js --ignore-path .gitignore && jest --coverage",
     "sls": "sls"
   },
   "dependencies": {
-    "@source4society/scepter-utility-lib": "^0.0.7",
+    "@source4society/scepter-dynamodb-lib": "^0.0.15",
+    "@source4society/scepter-utility-lib": "0.0.13",
+    "@source4society/scepter-validation-lib": "^0.0.3",
     "aws-sdk": "^2.149.0",
-    "eslint-plugin-jest": "^21.6.1",
     "mime-types": "^2.1.17",
     "optional-require": "^1.0.0"
   },
@@ -23,12 +24,12 @@
     "eslint": "^4.10.0",
     "eslint-config-standard": "^10.2.1",
     "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-jest": "^21.5.0",
     "eslint-plugin-node": "^5.2.1",
     "eslint-plugin-promise": "^3.6.0",
     "eslint-plugin-standard": "^3.0.1",
-    "eslint-plugin-jest": "^21.5.0",
     "jest-cli": "^21.2.1",
-    "serverless-azure-functions": "https://github.com/serverless/serverless-azure-functions",
-    "serverless": "^1.25.0"
+    "serverless": "^1.25.0",
+    "serverless-azure-functions": "https://github.com/serverless/serverless-azure-functions"
   }
 }

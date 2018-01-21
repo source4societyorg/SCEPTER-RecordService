@@ -13,9 +13,31 @@ provider:
         - lambda:InvokeFunction
         - lambda:InvokeAsync
       Resource: "*"
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem         
+        - dynamodb:BatchGetItem 
+      Resource: "arn:aws:dynamodb:*:${file(./credentials.json):environments.${self:provider.stage}.provider.aws.account}:table/*"
 functions:
-  hello:
-    handler: handler.hello
+  readRecord:
+    handler: handler.readRecord
+  updateUniqueRecord:
+    handler: handler.updateUniqueRecord  
+  updateDataRecord:
+    handler: handler.updateDataRecord
+  fetchRecords:
+    handler: handler.fetchRecords
+  disableUniqueRecord:
+    handler: handler.disableUniqueRecord
+  deleteUniqueRecord:
+    handler: handler.deleteUniqueRecord   
+  deleteRecord:
+    handler: handler.deleteRecord
+
 package:
   exclude: 
     - 'test/**'
