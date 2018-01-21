@@ -10,7 +10,7 @@ class RecordService {
     stage = 'dev', 
     credentialPath = './credentials.json', 
     servicesPath = './services.json', 
-    parametersPath = './parameters.json', 
+    parametersPath = './parameters.json'
   ) {
     this.credentials = immutable.fromJS(require(credentialPath))
     this.parameters = immutable.fromJS(require(parametersPath))
@@ -22,13 +22,13 @@ class RecordService {
   ///////////////////////////////////////////////////////////////////////////////////////
   //upsertUniqueRecord
   //
-  upsertUniqueRecord (tableName, recordType, countRecordType, idField, recordData, callback) {    
+  upsertUniqueRecord (tableName, recordType, countRecordType, idField, recordData, callback) { 
     this.standardParametersCheck('tableName', tableName)    
     this.standardParametersCheck('recordType', recordType)    
     this.standardParametersCheck('countRecordType', countRecordType)    
     this.standardParametersCheck('idField', idField)    
     this.standardParametersCheck('recordData', recordData)    
-    recordData = this.processUniqueData(recordData, recordType, idField) 
+    recordData = this.processUniqueData(recordData, recordType, idField)
     utilities.initiateSequence(this.upsertUniqueRecordSequence(callback, tableName, recordData, recordType, countRecordType, idField), callback)
   }
 
@@ -39,8 +39,7 @@ class RecordService {
   }
 
   processUniqueData (recordData, recordType, idField) {
-    this.standardParametersCheck('created timestamp', recordData.created)
-    recordData[idField] = utilities.valueOrDefault(recordData[idField], assignUid())
+    recordData[idField] = utilities.valueOrDefault(recordData[idField], this.assignUid())
     recordData.recordType = recordType
     recordData.enabled = utilities.valueOrDefault(recordData.enabled, true)
     recordData['enabled-recordType'] = recordData.enabled + '-' + recordType
@@ -52,10 +51,10 @@ class RecordService {
   }
 
   *upsertUniqueRecordSequence (finalCallback, tableName, recordData, recordType, countRecordType, idField) { 
-    let callback = yield;
-    let result = yield this.performRecordUpsert(tableName, recordData, callback)
-    let countData = yield this.readRecord(tableName, recordType, countRecordType, callback)
-    result = yield this.updateRecordCount(countData, tableName, countRecordType, recordType, 'increment', callback) 
+    let sequenceCallback = yield;
+    let result = yield this.performRecordUpsert(tableName, recordData, sequenceCallback)
+    let countData = yield this.readRecord(tableName, recordType, countRecordType, sequenceCallback)
+    result = yield this.updateRecordCount(countData, tableName, countRecordType, recordType, 'increment', sequenceCallback) 
     finalCallback(undefined, { recordId: recordData[idField] })   
   }
 
@@ -65,6 +64,7 @@ class RecordService {
 
   updateRecordCount (countRecord, tableName, countRecordType, recordType, mode, callback) {
     let enabledRecords = utilities.getInOrDefault(countRecord, ['Item', 'enabledRecords'], 0)
+    let applyCondition = utilities.isNotEmpty(utilities.getInOrDefault(countRecord, ['Item', 'enabledRecords']))
     let updatedEnabledRecords = utilities.ifTrueElseDefault(mode !== 'increment', (enabledRecords - 1), enabledRecords + 1)
     let userCountRecord = {
       enabledRecords: updatedEnabledRecords,
@@ -72,8 +72,8 @@ class RecordService {
       recordId: recordType
     }
     let options = { 
-      ConditionExpression: 'enabledRecords = :enabledRecords', 
-      ExpressionAttributeValues: { ':enabledRecords': enabledRecords } 
+      ConditionExpression: utilities.ifTrueElseDefault(applyCondition, 'enabledRecords = :enabledRecords', undefined),
+      ExpressionAttributeValues: utilities.ifTrueElseDefault( applyCondition, { ':enabledRecords': enabledRecords }, undefined) 
     } 
     this.dynamoDB.putItem(tableName, userCountRecord, callback, options)         
   }
@@ -82,10 +82,15 @@ class RecordService {
   upsertDataRecord (tableName, recordData, callback) {    
     this.standardParametersCheck('tableName', tableName)    
     this.standardParametersCheck('recordData', recordData)    
-    recordData = this.processData(recordData, recordType) 
+    recordData = this.processData(recordData) 
     this.performRecordUpsert(tableName, recordData, callback)
   }
- 
+
+  processData (recordData) {
+    this.standardParametersCheck('created timestamp', recordData.created)
+    return recordData
+  }
+
   //////////////////////////////////////////////////////////////////////////////////////////////
   // readRecord
   readRecord (tableName, recordId, recordType, callback) {
@@ -176,7 +181,7 @@ class RecordService {
   // Responses
   //
   prepareErrorResponse (error) {    
-    return { status: false, errors: error }
+    return { status: false, errors: utilities.valueOrDefault(error.message, error) }
   }
 
   prepareSuccessResponse (data) {

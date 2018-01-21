@@ -35,9 +35,9 @@ const genericHandlerFunction = (
 }
 
 const updateUniqueRecordFunction = (event, context, callback, genericHandler = genericHandlerFunction) => 
-  genericHandler(event, context, callback, (service, callbackHandler, errorHandler, successHandler, eventData) => 
+  genericHandler(event, context, callback, (service, callbackHandler, errorHandler, successHandler, eventData) => {
     service.upsertUniqueRecord(eventData.tableName, eventData.recordType, eventData.countRecordType, eventData.idField, eventData.recordData, (err, data) => callbackHandler(err, data, errorHandler, successHandler)
-  )
+  )}
 )
 
 const readRecordFunction = (event, context, callback, genericHandler = genericHandlerFunction) => 
@@ -72,7 +72,7 @@ const deleteRecordFunction = (event, context, callback, genericHandler = generic
 
 const updateDataRecordFunction = (event, context, callback, genericHandler = genericHandlerFunction) => 
   genericHandler(event, context, callback, (service, callbackHandler, errorHandler, successHandler, eventData) => 
-    service.upsertDataRecord(eventData.record, (err, data) => callbackHandler(err, data, errorHandler, successHandler)
+    service.upsertDataRecord(eventData.tableName, eventData.recordData, (err, data) => callbackHandler(err, data, errorHandler, successHandler)
   )
 )
 

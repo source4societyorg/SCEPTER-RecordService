@@ -1,0 +1,10 @@
+{"tableName":"nrac-organization-dev",
+"recordType":"organization-name",
+"countRecordType":"organization-count",
+"idField":"organizationId",
+"recordData":{
+"accountType":"123",
+"name":"test org",
+"amount":"50",
+"recordType":"organization-name",
+ "recordId": "test org"}}

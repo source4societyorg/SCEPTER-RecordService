@@ -12,8 +12,8 @@
     "sls": "sls"
   },
   "dependencies": {
-    "@source4society/scepter-dynamodb-lib": "^0.0.15",
-    "@source4society/scepter-utility-lib": "0.0.13",
+    "@source4society/scepter-dynamodb-lib": "^0.0.16",
+    "@source4society/scepter-utility-lib": "0.0.17",
     "@source4society/scepter-validation-lib": "^0.0.3",
     "aws-sdk": "^2.149.0",
     "mime-types": "^2.1.17",
