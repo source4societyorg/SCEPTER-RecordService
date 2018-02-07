@@ -40,6 +40,12 @@ const updateUniqueRecordFunction = (event, context, callback, genericHandler = g
   )}
 )
 
+const modifyUniqueRecordFunction = (event, context, callback, genericHandler = genericHandlerFunction) => 
+  genericHandler(event, context, callback, (service, callbackHandler, errorHandler, successHandler, eventData) => {
+    service.upsertUniqueRecord(eventData.tableName, eventData.newRecordData, eventData.oldRecordId, (err, data) => callbackHandler(err, data, errorHandler, successHandler)
+  )}
+)
+
 const readRecordFunction = (event, context, callback, genericHandler = genericHandlerFunction) => 
   genericHandler(event, context, callback, (service, callbackHandler, errorHandler, successHandler, eventData) => {
     service.readRecord(eventData.tableName, eventData.recordId, eventData.recordType, (err, data) => callbackHandler(err, data, errorHandler, successHandler))
@@ -48,7 +54,7 @@ const readRecordFunction = (event, context, callback, genericHandler = genericHa
  
 const fetchRecordsFunction = (event, context, callback, genericHandler = genericHandlerFunction) => 
   genericHandler(event, context, callback, (service, callbackHandler, errorHandler, successHandler, eventData) => {
-    service.fetchRecordsByType(eventData.tableName, eventData.recordType, (err, data) => callbackHandler(err, data, errorHandler, successHandler), eventData.options) 
+    service.fetchRecords(eventData.tableName, eventData.keyExpression, eventData.option, (err, data) => callbackHandler(err, data, errorHandler, successHandler)) 
   }
 )
 
@@ -79,6 +85,7 @@ const updateDataRecordFunction = (event, context, callback, genericHandler = gen
 module.exports.genericHandlerFunction = genericHandlerFunction
 //////////////////////////////////////////////////////////////
 module.exports.updateUniqueRecord = updateUniqueRecordFunction
+module.exports.modifyUniqueRecord = modifyUniqueRecordFunction
 module.exports.readRecord = readRecordFunction 
 module.exports.fetchRecords = fetchRecordsFunction
 module.exports.disableUniqueRecord = disableUniqueRecordFunction 

@@ -25,6 +25,8 @@ provider:
 functions:
   readRecord:
     handler: handler.readRecord
+  modifyUniqueRecord:
+    handler: handler.modifyUniqueRecord  
   updateUniqueRecord:
     handler: handler.updateUniqueRecord  
   updateDataRecord:

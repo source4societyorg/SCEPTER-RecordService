@@ -20,6 +20,25 @@ class RecordService {
   }
 
   ///////////////////////////////////////////////////////////////////////////////////////
+  //modifyUniqueRecord
+  //
+  modifyUniqueRecord (tableName, newRecordData, oldRecordId, callback) { 
+    this.standardParametersCheck('tableName', tableName)    
+    this.standardParametersCheck('newRecordData', newRecordData)    
+    this.standardParametersCheck('oldRecordId', oldRecordId)    
+    recordData = this.processUniqueData(newRcordData, recordType, idField)
+    utilities.initiateSequence(this.modifyUniqueRecordSequence(callback, tableName, recordData, recordType, oldRecordId, idField), callback)
+  }
+
+  *modifyUniqueRecordSequence (finalCallback, tableName, recordData, recordType, oldRecordId, idField) { 
+    let sequenceCallback = yield;
+    let result = yield this.performRecordUpsert(tableName, recordData, sequenceCallback)
+    result = yield this.deleteRecord(tableName, oldRecordId, recordType, sequenceCallback)
+    finalCallback(undefined, { recordId: recordData[idField] })   
+  }
+
+
+  ///////////////////////////////////////////////////////////////////////////////////////
   //upsertUniqueRecord
   //
   upsertUniqueRecord (tableName, recordType, countRecordType, idField, recordData, callback) { 
@@ -102,12 +121,10 @@ class RecordService {
   //////////////////////////////////////////////////////////////////////////////////////////////
 
   //////////////////////////////////////////////////////////////////////////////////////////////
-  // fetchRecordsByType
-  fetchRecordsByType (tableName, recordType, callback, options, keyExpression) {
+  // fetchRecords
+  fetchRecords (tableName, keyExpression, options, callback) {
     this.standardParametersCheck('tableName', tableName)    
-    this.standardParametersCheck('recordType', recordType)   
-    keyExpression = utilities.valueOrDefault(keyExpression, 'recordType = :recordType')
-    options = utilities.valueOrDefault(options, { IndexName: 'recordType-index', ExpressionAttributeValues: {':recordType': recordType} }) 
+    this.standardParametersCheck('keyExpression', keyExpression)
     this.dynamoDB.query(tableName, keyExpression, callback, options)
   }
   //////////////////////////////////////////////////////////////////////////////////////////////
